@@ -17,28 +17,42 @@ class DatabaseHelper {
     if (_database != null) return _database!;
     _database = await _initDB('finance_manager.db');
     return _database!;
-  }
-
-  Future<Database> _initDB(String filePath) async {
+  }  Future<Database> _initDB(String filePath) async {
     try {
       if (kIsWeb) {
         // Webプラットフォームの場合
+        debugPrint('Web環境でのデータベース初期化を試みます（シンプルモード）...');
+        
+        // WebプラットフォームにはIndexedDBを直接使用
         databaseFactory = databaseFactoryFfiWeb;
+        
+        // 単純化したデータベースオプション
+        return await databaseFactory.openDatabase(
+          filePath,
+          options: OpenDatabaseOptions(
+            version: _databaseVersion,
+            onCreate: _createDB,
+            onUpgrade: _onUpgrade,
+          ),
+        );
       } else {
         // ネイティブプラットフォームの場合
-        sqfliteFfiInit();
-        databaseFactory = databaseFactoryFfi;
-      }
-      
-      final dbPath = await getDatabasesPath();
-      final path = join(dbPath, filePath);
+        debugPrint('ネイティブ環境でのデータベース初期化を試みます...');
+        if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+          sqfliteFfiInit();
+          databaseFactory = databaseFactoryFfi;
+        }
+        
+        final dbPath = await getDatabasesPath();
+        final path = join(dbPath, filePath);
 
-      return await openDatabase(
-        path,
-        version: _databaseVersion,
-        onCreate: _createDB,
-        onUpgrade: _onUpgrade,
-      );
+        return await openDatabase(
+          path,
+          version: _databaseVersion,
+          onCreate: _createDB,
+          onUpgrade: _onUpgrade,
+        );
+      }
     } catch (e) {
       debugPrint('データベースの初期化に失敗しました: $e');
       rethrow;

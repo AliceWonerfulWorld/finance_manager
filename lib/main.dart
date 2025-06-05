@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:finance_manager/ui/home/home_screen.dart';
 import 'package:finance_manager/ui/dashboard/dashboard_screen.dart';
-import 'package:finance_manager/ui/analytics/analytics_screen.dart';
 import 'package:finance_manager/config/database_helper.dart';
+import 'package:finance_manager/config/web_error_handler.dart'; // エラーハンドラー追加
 import 'package:finance_manager/providers/transaction_provider.dart';
 import 'package:finance_manager/ui/transactions/transactions_screen.dart';
 import 'package:finance_manager/ui/settings/settings_screen.dart';
@@ -14,46 +15,96 @@ import 'package:finance_manager/providers/goal_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:finance_manager/providers/budget_provider.dart';
 import 'package:finance_manager/providers/savings_provider.dart';
+import 'package:finance_manager/ui/splash/splash_screen.dart'; // スプラッシュ画面を追加
+
+// Web専用のエントリーポイント
+import 'web_main_entry.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // データベース初期化のため必要
   print("💾 アプリの初期化開始...");
-
-  // データベースを事前に初期化
-  await DatabaseHelper.instance.database;
-  print("✅ データベースの準備完了");
-
-  final prefs = await SharedPreferences.getInstance();
-  final transactionProvider = TransactionProvider();
   
-  runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => transactionProvider),
-        ChangeNotifierProvider(create: (_) => GoalProvider(prefs)),
-        ChangeNotifierProvider(create: (_) => BudgetProvider(prefs, transactionProvider)),
-        ChangeNotifierProvider(create: (_) => SavingsProvider()),
-      ],
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: '家計簿アプリ',
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-          useMaterial3: true,
-          textTheme: GoogleFonts.notoSansJpTextTheme(),
-        ),
-        localizationsDelegates: [
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        supportedLocales: [
-          Locale('ja', 'JP'),
-        ],
-        home: const MainScreen(),
+  final prefs = await SharedPreferences.getInstance();
+
+  // Webプラットフォームと通常プラットフォームでアプリを分離
+  if (kIsWeb) {
+    print("🌐 Web環境専用モードで実行します");
+    
+    // Web専用アプリを起動（データベースの初期化を最小限に）
+    runApp(WebApp(prefs: prefs));
+  } else {
+    // 通常のモバイル/デスクトップ向けフロー
+    print("📱 通常環境で実行します");
+    
+    // データベース初期化
+    try {
+      await DatabaseHelper.instance.database;
+      print("✅ データベースの準備完了");
+    } catch (e) {
+      print("❌ データベース初期化中にエラーが発生しました: $e");
+    }
+
+    final transactionProvider = TransactionProvider();
+    
+    // プロバイダー設定
+    final providers = [
+      ChangeNotifierProvider(create: (_) => transactionProvider),
+      ChangeNotifierProvider(create: (_) => GoalProvider(prefs)),
+      ChangeNotifierProvider(create: (_) => BudgetProvider(prefs, transactionProvider)),
+      ChangeNotifierProvider(create: (_) => SavingsProvider()),
+    ];
+    
+    // アプリのメインUI定義
+    final mainApp = MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: '家計簿アプリ',
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+        useMaterial3: true,
+        textTheme: GoogleFonts.notoSansJpTextTheme(),
       ),
-    ),
-  );
+      localizationsDelegates: [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: [
+        Locale('ja', 'JP'),
+      ],
+      home: const MainScreen(),
+    );
+    
+    // スプラッシュ画面を表示してからメインアプリへ
+    runApp(
+      MultiProvider(
+        providers: providers,
+        child: WebErrorHandler(
+          child: MaterialApp(
+            debugShowCheckedModeBanner: false,
+            theme: ThemeData(
+              colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+              useMaterial3: true,
+              textTheme: GoogleFonts.notoSansJpTextTheme(),
+            ),
+            localizationsDelegates: [
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: [
+              Locale('ja', 'JP'),
+            ],
+            home: SplashScreen(
+              nextScreen: MultiProvider(
+                providers: providers,
+                child: mainApp,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class MyApp extends StatefulWidget {
