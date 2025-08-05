@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:finance_manager/providers/transaction_provider.dart';
-import 'package:finance_manager/models/transaction_model.dart';
 
 class FavoritesScreen extends StatelessWidget {
   const FavoritesScreen({super.key});
@@ -99,7 +98,7 @@ class FavoritesScreen extends StatelessWidget {
                     ],
                   ),
                   onTap: () {
-                    // TODO: 取引詳細画面への遷移
+                    // 取引詳細画面への遷移（将来実装予定）
                   },
                 ),
               );

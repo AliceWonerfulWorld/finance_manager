@@ -1,11 +1,38 @@
+/// 取引データを表すモデルクラス
+/// 
+/// このクラスは個々の取引記録を表し、以下の情報を保持します：
+/// - 取引ID（データベース用）
+/// - カテゴリ（食費、交通費等）
+/// - 金額
+/// - 取引日時
+/// - 取引種別（収入/支出）
+/// - ジャンル（詳細分類）
 class TransactionModel {
+  /// データベースの主キー（null可能）
   int? id;
+  
+  /// 取引のカテゴリ（例：食費、交通費、給与等）
   String category;
+  
+  /// 取引金額（正の値）
   double amount;
+  
+  /// 取引が発生した日時
   DateTime date;
-  String type; // 'income' or 'expense'
-  String genre; 
-
+  
+  /// 取引の種別（'income' または 'expense'）
+  String type;
+  
+  /// 取引のジャンル（カテゴリの詳細分類）
+  String genre;
+  /// 新しい取引モデルを作成します
+  /// 
+  /// [category] 取引のカテゴリ
+  /// [amount] 取引金額（正の値）
+  /// [date] 取引日時
+  /// [type] 取引種別（'income' または 'expense'）
+  /// [genre] 取引のジャンル
+  /// [id] データベースID（通常は自動生成）
   TransactionModel({
     this.id,
     required this.category,
@@ -15,7 +42,7 @@ class TransactionModel {
     required this.genre, 
   });
 
-  // データベースに保存するためのマップ形式に変換
+  /// データベースに保存するためのマップ形式に変換します
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -26,8 +53,10 @@ class TransactionModel {
       'genre': genre, 
     };
   }
-
-  // データベースから取得したマップを `TransactionModel` に変換
+  /// データベースから取得したマップから TransactionModel を作成します
+  /// 
+  /// [map] データベースから取得したマップデータ
+  /// 戻り値: 新しいTransactionModelインスタンス
   factory TransactionModel.fromMap(Map<String, dynamic> map) {
     return TransactionModel(
       id: map['id'] as int?,
