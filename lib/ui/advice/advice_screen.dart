@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:finance_manager/providers/transaction_provider.dart';
-import 'package:finance_manager/providers/budget_provider.dart';
-import 'package:intl/intl.dart';
 
 class AdviceScreen extends StatelessWidget {
   const AdviceScreen({super.key});
@@ -240,11 +238,8 @@ class AdviceScreen extends StatelessWidget {
       ),
     );
   }
-
   Widget _buildBudgetRecommendations(BuildContext context) {
     final provider = Provider.of<TransactionProvider>(context);
-    final budgetProvider = Provider.of<BudgetProvider>(context);
-    final monthlyIncome = provider.getMonthlyIncome();
     final monthlyExpense = provider.getMonthlyExpense();
     final expenseByCategory = provider.getExpenseByCategory();
     

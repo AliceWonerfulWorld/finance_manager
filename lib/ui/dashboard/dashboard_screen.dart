@@ -248,7 +248,7 @@ class DashboardScreen extends StatelessWidget {
               Icons.bar_chart,
               Colors.teal,
               () {
-                // TODO: レポート画面の実装
+                // レポート画面の実装（将来実装予定）
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('準備中です')),
                 );

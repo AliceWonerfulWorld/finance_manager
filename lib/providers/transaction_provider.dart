@@ -6,6 +6,15 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:uuid/uuid.dart';
 
+/// 取引データの管理を行うプロバイダークラス
+/// 
+/// このクラスは以下の機能を提供します：
+/// - 取引データの追加、更新、削除
+/// - 収入・支出の集計
+/// - 残高の計算
+/// - カテゴリ別集計
+/// - データベースとの同期
+/// - Webストレージ対応
 class TransactionProvider with ChangeNotifier {
   final List<TransactionModel> _transactions = [];
   final DatabaseHelper _dbHelper = DatabaseHelper.instance;
@@ -188,7 +197,7 @@ class TransactionProvider with ChangeNotifier {
   }
 
   double getBudgetAchievementRate(String category) {
-    // TODO: 予算データの実装後に更新
+    // 予算データの実装後に更新予定
     return 0.0;
   }
 
