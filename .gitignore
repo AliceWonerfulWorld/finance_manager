@@ -43,3 +43,43 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# API Keys and Sensitive Information
+*.env
+.env
+.env.local
+.env.development
+.env.production
+.env.staging
+
+# Firebase configuration files
+google-services.json
+GoogleService-Info.plist
+firebase_options.dart
+
+# API Keys and Secrets
+api_keys.dart
+secrets.dart
+config/secrets.dart
+lib/config/secrets.dart
+
+# Service account keys
+service-account-key.json
+service-account-*.json
+firebase-service-account.json
+
+# Other sensitive files
+*.pem
+*.key
+*.p12
+*.keystore
+*.jks
+
+# Local configuration files
+config.local.dart
+local_config.dart
+
+# Backup files
+*.bak
+*.backup
+*~
