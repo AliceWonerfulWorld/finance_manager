@@ -11,7 +11,7 @@ import 'package:finance_manager/ui/home/home_screen.dart';
 import 'package:finance_manager/ui/dashboard/dashboard_screen.dart';
 import 'package:finance_manager/ui/transactions/transactions_screen.dart';
 import 'package:finance_manager/ui/settings/settings_screen.dart';
-import 'package:finance_manager/ui/splash/splash_screen.dart'; // スプラッシュ画面を追加
+import 'package:finance_manager/ui/splash/splash_screen.dart';
 
 // プロバイダー
 import 'package:finance_manager/providers/transaction_provider.dart';
@@ -24,7 +24,8 @@ class WebApp extends StatelessWidget {
   final SharedPreferences prefs;
   
   const WebApp({Key? key, required this.prefs}) : super(key: key);
-    @override
+  
+  @override
   Widget build(BuildContext context) {
     final transactionProvider = TransactionProvider();
     
@@ -36,27 +37,6 @@ class WebApp extends StatelessWidget {
       ChangeNotifierProvider(create: (_) => SavingsProvider()),
     ];
     
-    // メインアプリ画面
-    final mainApp = MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: '家計簿アプリ',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        useMaterial3: true,
-        textTheme: GoogleFonts.notoSansJpTextTheme(),
-      ),
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [
-        Locale('ja', 'JP'),
-      ],
-      home: const WebMainScreen(),
-    );
-    
-    // スプラッシュ画面からメインアプリへ遷移
     return MultiProvider(
       providers: providers,
       child: MaterialApp(
@@ -75,9 +55,23 @@ class WebApp extends StatelessWidget {
           Locale('ja', 'JP'),
         ],
         home: SplashScreen(
-          nextScreen: MultiProvider(
-            providers: providers,
-            child: mainApp,
+          nextScreen: MaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: '家計簿アプリ',
+            theme: ThemeData(
+              colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+              useMaterial3: true,
+              textTheme: GoogleFonts.notoSansJpTextTheme(),
+            ),
+            localizationsDelegates: const [
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [
+              Locale('ja', 'JP'),
+            ],
+            home: const WebMainScreen(),
           ),
         ),
       ),
